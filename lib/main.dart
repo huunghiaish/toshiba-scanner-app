@@ -2,6 +2,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scanner_product_app/handleFile.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 // Defined Type
 class Product {
@@ -79,17 +80,19 @@ class _MyHomePageState extends State<MyHomePage> {
   String _mode = 'Single';
 
   List<String> _productList = [
-    // '8858730365089,GR-A13VT(H)',
-    // '8858730365096,GR-A13VPT(SX)',
-    // '8858730365102,GR-A13VPT(LB)',
-    // '8858730365119,GR-A13VPT(BX)',
-    // '8858730365256,GR-W21VPB(C)',
-    // '8858730365263,GR-W21VPB(DS)',
-    // '8858730365249,GR-W21VPB(S)',
-    // '8858730365294,GR-W21VUB(BS)',
-    // '8858730365300,GR-W21VUB(TS)'
+    '8858730365089,GR-A13VT(H)',
+    '8858730365096,GR-A13VPT(SX)',
+    '8858730365102,GR-A13VPT(LB)',
+    '8858730365119,GR-A13VPT(BX)',
+    '8858730365256,GR-W21VPB(C)',
+    '8858730365263,GR-W21VPB(DS)',
+    '8858730365249,GR-W21VPB(S)',
+    '8858730365294,GR-W21VUB(BS)',
+    '8858730365300,GR-W21VUB(TS)'
   ];
+
   late List<Product> _productScanList = [];
+  late final List<String> _productSerialReturn = [];
 
   late String? _destination = '';
   late String? _invoice = '';
@@ -108,6 +111,10 @@ class _MyHomePageState extends State<MyHomePage> {
   var textModelController = TextEditingController();
   var textSerialController = TextEditingController();
 
+  FocusNode textDestinationNode = FocusNode();
+  FocusNode textInvoiceNode = FocusNode();
+  FocusNode textTruckIDNode = FocusNode();
+  FocusNode dropdownModeNode = FocusNode();
   FocusNode textBarcodeNode = FocusNode();
   FocusNode textSerialNode = FocusNode();
 
@@ -201,35 +208,59 @@ class _MyHomePageState extends State<MyHomePage> {
                   setState(() {
                     _type = newValue!;
                   });
+                  FocusScope.of(context).requestFocus(textDestinationNode);
                 },
               ),
               TextFormField(
                   controller: textDestinationController,
-                  decoration: const InputDecoration(labelText: "Destination"),
-                  onChanged: (value) => {
-                        setState(() {
-                          _destination = value.trim();
-                        })
-                      }),
+                  decoration: InputDecoration(
+                      labelText: "Destination",
+                      suffixIcon: IconButton(
+                        onPressed: textDestinationController.clear,
+                        icon: const Icon(Icons.clear),
+                      )),
+                  focusNode: textDestinationNode,
+                  onFieldSubmitted: (String value) {
+                    setState(() {
+                      _destination = value.trim();
+                    });
+                    FocusScope.of(context).requestFocus(textInvoiceNode);
+                  }),
               TextFormField(
                   controller: textInvoiceController,
-                  decoration: const InputDecoration(labelText: "Invoice"),
-                  onChanged: (value) => {
-                        setState(() {
-                          _invoice = value.trim();
-                        })
-                      }),
+                  decoration: InputDecoration(
+                      labelText: "Invoice",
+                      suffixIcon: IconButton(
+                        onPressed: textInvoiceController.clear,
+                        icon: const Icon(Icons.clear),
+                      )),
+                  focusNode: textInvoiceNode,
+                  onFieldSubmitted: (String value) {
+                    setState(() {
+                      _invoice = value.trim();
+                    });
+                    FocusScope.of(context).requestFocus(textTruckIDNode);
+                  }),
+
               TextFormField(
                   controller: textTruckIDController,
-                  decoration: const InputDecoration(labelText: "Truck ID"),
-                  onChanged: (value) => {
-                        setState(() {
-                          _truckID = value.trim();
-                        })
-                      }),
+                  decoration: InputDecoration(
+                      labelText: "Truck ID",
+                      suffixIcon: IconButton(
+                        onPressed: textTruckIDController.clear,
+                        icon: const Icon(Icons.clear),
+                      )),
+                  focusNode: textTruckIDNode,
+                  onFieldSubmitted: (String value) {
+                    setState(() {
+                      _truckID = value.trim();
+                    });
+                    // FocusScope.of(context).requestFocus(dropdownModeNode);
+                  }),
               DropdownButtonFormField(
                 decoration: const InputDecoration(labelText: "Mode"),
                 value: _mode,
+                focusNode: dropdownModeNode,
                 icon: const Icon(Icons.keyboard_arrow_down),
                 items: _listMode.map((String items) {
                   return DropdownMenuItem(
@@ -241,17 +272,36 @@ class _MyHomePageState extends State<MyHomePage> {
                   setState(() {
                     _mode = newValue!;
                   });
+                  FocusScope.of(context).requestFocus(textBarcodeNode);
                 },
               ),
               TextFormField(
                   controller: textBarcodeController,
-                  decoration: const InputDecoration(labelText: "Barcode"),
+                  decoration: InputDecoration(
+                      labelText: "Barcode",
+                      suffixIcon: IconButton(
+                        onPressed: textBarcodeController.clear,
+                        icon: const Icon(Icons.clear),
+                      )),
                   focusNode: textBarcodeNode,
                   onEditingComplete: () {
                     int index = _productList.indexWhere(
                         (element) => element.contains('$_barcode,'));
                     if (index < 0) {
                       // notification
+                      var snackBar = SnackBar(
+                        elevation: 0,
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.transparent,
+                        content: AwesomeSnackbarContent(
+                          title: 'Error 401!',
+                          message:
+                              'Barcode của sản phẩm này không tồn tại trong list product import',
+                          contentType: ContentType.failure,
+                        ),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      FocusScope.of(context).requestFocus(textBarcodeNode);
                     } else {
                       String model = _productList[index].split(',')[1];
                       setState(() {
@@ -274,41 +324,66 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               TextFormField(
                 controller: textSerialController,
-                decoration: const InputDecoration(labelText: "Serial"),
+                decoration: InputDecoration(
+                    labelText: "Serial",
+                    suffixIcon: IconButton(
+                      onPressed: textSerialController.clear,
+                      icon: const Icon(Icons.clear),
+                    )),
                 focusNode: textSerialNode,
                 onFieldSubmitted: (String value) {
-                  setState(() {
-                    _serial = value.trim();
-                  });
-                  if (_barcode != '' && _model != '' && _serial != '') {
-                    // save list product scan
+                  var contain = _productScanList
+                      .where((element) => element._serial == value);
+                  if (contain.isEmpty) {
                     setState(() {
-                      _productScanList.add(Product(_barcode, _model, _serial));
+                      _serial = value.trim();
                     });
-                    if (_mode == 'Single') {
-                      textBarcodeController.clear();
-                      textModelController.clear();
-                      textSerialController.clear();
+                    if (_barcode != '' && _model != '' && _serial != '') {
+                      // save list product scan
                       setState(() {
-                        _barcode = '';
-                        _model = '';
-                        _serial = '';
+                        _productScanList
+                            .add(Product(_barcode, _model, _serial));
                       });
-                      FocusScope.of(context).requestFocus(textBarcodeNode);
+                      if (_mode == 'Single') {
+                        textBarcodeController.clear();
+                        textModelController.clear();
+                        textSerialController.clear();
+                        setState(() {
+                          _barcode = '';
+                          _model = '';
+                          _serial = '';
+                        });
+                        FocusScope.of(context).requestFocus(textBarcodeNode);
+                      } else {
+                        // Multiple
+                        textSerialController.clear();
+                        setState(() {
+                          _serial = '';
+                        });
+                        FocusScope.of(context).requestFocus(textSerialNode);
+                      }
                     } else {
-                      // Multiple
-                      textSerialController.clear();
-                      setState(() {
-                        _serial = '';
-                      });
-                      FocusScope.of(context).requestFocus(textSerialNode);
+                      if (_serial == '') {
+                        FocusScope.of(context).requestFocus(textSerialNode);
+                      } else {
+                        FocusScope.of(context).requestFocus(textBarcodeNode);
+                      }
                     }
                   } else {
-                    if (_serial == '') {
-                      FocusScope.of(context).requestFocus(textSerialNode);
-                    } else {
-                      FocusScope.of(context).requestFocus(textBarcodeNode);
-                    }
+                    // notification existed serial
+                    var snackBar = SnackBar(
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error 402!',
+                        message:
+                            'Mã seri của sản phẩm này đã được scan rồi, vui lòng kiễm tra lại!',
+                        contentType: ContentType.failure,
+                      ),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    FocusScope.of(context).requestFocus(textSerialNode);
                   }
                 },
               ),
