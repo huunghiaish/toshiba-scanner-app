@@ -39,6 +39,18 @@ class HandleFile {
     return file.writeAsString(productList);
   }
 
+  Future<File> get _localFileProductScan async {
+    final path = await _localPath;
+    return File('$path/productScans.txt');
+  }
+
+  Future<File> writeProductScans(String productList) async {
+    final file = await _localFileProductScan;
+
+    // Write the file
+    return file.writeAsString(productList);
+  }
+
   Future<List<String>> readProducts() async {
     try {
       List<String> productList = [];
@@ -62,8 +74,39 @@ class HandleFile {
     } catch (e) {
       // If encountering an error, return 0
       print(e);
-      _scaffoldKey.currentState
-          ?.showSnackBar(const SnackBar(content: Text('NOT PRODUCTS!')));
+      return [];
+    }
+    return [];
+  }
+
+  Future<List<String>> readProductScans() async {
+    try {
+      List<String> productScanList = [];
+      if (kIsWeb) {
+        print("read file web");
+        return [
+          '8858730365089,GR-A12VT(H),123',
+          '8858730365089,GR-A13VT(H),456',
+          '8858730365089,GR-A14VT(H),789',
+        ];
+      } else {
+        print("read file mobile");
+        final file = await _localFileProductScan;
+
+        // Read the file
+        // final contents = await file.readAsString();
+        // handle file
+        await file
+            .openRead()
+            .transform(utf8.decoder)
+            .transform(const LineSplitter())
+            .forEach((line) => {productScanList.add(line)});
+        // list product return
+        return productScanList;
+      }
+    } catch (e) {
+      // If encountering an error, return 0
+      print(e);
       return [];
     }
     return [];

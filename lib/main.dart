@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scanner_product_app/handleFile.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:scanner_product_app/screens/productScan.dart';
 
 // Defined Type
 class Product {
@@ -13,12 +15,15 @@ class Product {
 }
 
 void main() {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
       builder: (context) => const MyApp(), // Wrap your app
     ),
   );
+  FlutterNativeSplash.remove();
 }
 
 class MyApp extends StatelessWidget {
@@ -79,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _type = 'Transfer';
   String _mode = 'Single';
 
-  List<String> _productList = [
+  late final List<String> _productList = [
     '8858730365089,GR-A13VT(H)',
     '8858730365096,GR-A13VPT(SX)',
     '8858730365102,GR-A13VPT(LB)',
@@ -132,22 +137,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
           title: Center(
         child: Text(widget.title),
       )),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      resizeToAvoidBottomInset: true,
+      body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[_mainForm(), _scanForm()],
@@ -180,15 +176,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       icon: const Icon(Icons.upload_file_outlined),
                       tooltip: 'Upload products',
                       onPressed: () {
-                        widget.handleFile.pickFile().then((value) => {
-                              if (value == true) {print("Import thanh cong")},
-                              widget.handleFile.readProducts().then((value) => {
-                                    print(value),
-                                    {
-                                      setState(() => {_productList = value}),
-                                    },
-                                  })
-                            });
+                        // widget.handleFile.pickFile().then((value) => {
+                        //       if (value == true) {print("Import thanh cong")},
+                        //       widget.handleFile.readProducts().then((value) => {
+                        //             print(value),
+                        //             {
+                        //               setState(() => {_productList = value}),
+                        //             },
+                        //           })
+                        //     });
                       },
                     ),
                   ),
@@ -216,7 +212,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   decoration: InputDecoration(
                       labelText: "Destination",
                       suffixIcon: IconButton(
-                        onPressed: textDestinationController.clear,
+                        onPressed: () {
+                          textDestinationController.clear();
+                          setState(() => {_destination = ''});
+                        },
                         icon: const Icon(Icons.clear),
                       )),
                   focusNode: textDestinationNode,
@@ -231,23 +230,26 @@ class _MyHomePageState extends State<MyHomePage> {
                   decoration: InputDecoration(
                       labelText: "Invoice",
                       suffixIcon: IconButton(
-                        onPressed: textInvoiceController.clear,
+                        onPressed: () {
+                          textInvoiceController.clear();
+                          setState(() => {_invoice = ''});
+                        },
                         icon: const Icon(Icons.clear),
                       )),
                   focusNode: textInvoiceNode,
                   onFieldSubmitted: (String value) {
-                    setState(() {
-                      _invoice = value.trim();
-                    });
+                    setState(() => {_invoice = value.trim()});
                     FocusScope.of(context).requestFocus(textTruckIDNode);
                   }),
-
               TextFormField(
                   controller: textTruckIDController,
                   decoration: InputDecoration(
                       labelText: "Truck ID",
                       suffixIcon: IconButton(
-                        onPressed: textTruckIDController.clear,
+                        onPressed: () {
+                          textTruckIDController.clear();
+                          setState(() => {_truckID = ''});
+                        },
                         icon: const Icon(Icons.clear),
                       )),
                   focusNode: textTruckIDNode,
@@ -280,13 +282,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   decoration: InputDecoration(
                       labelText: "Barcode",
                       suffixIcon: IconButton(
-                        onPressed: textBarcodeController.clear,
+                        onPressed: () {
+                          textBarcodeController.clear();
+                          textModelController.clear();
+                          setState(() => {_barcode = '', _model = ''});
+                        },
                         icon: const Icon(Icons.clear),
                       )),
                   focusNode: textBarcodeNode,
                   onEditingComplete: () {
                     int index = _productList.indexWhere(
-                        (element) => element.contains('$_barcode,'));
+                        (element) => element.split(',')[0] == _barcode);
                     if (index < 0) {
                       // notification
                       var snackBar = SnackBar(
@@ -327,7 +333,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 decoration: InputDecoration(
                     labelText: "Serial",
                     suffixIcon: IconButton(
-                      onPressed: textSerialController.clear,
+                      onPressed: () {
+                        textSerialController.clear();
+                        setState(() => {_serial = ''});
+                      },
                       icon: const Icon(Icons.clear),
                     )),
                 focusNode: textSerialNode,
@@ -344,22 +353,26 @@ class _MyHomePageState extends State<MyHomePage> {
                         _productScanList
                             .add(Product(_barcode, _model, _serial));
                       });
+                      String contentProductScan = '';
+                      for (var item in _productScanList) {
+                        contentProductScan =
+                            '$contentProductScan${item._barcode},${item._model},${item._serial}\n';
+                      }
+                      // widget.handleFile.writeProductScans(contentProductScan);
                       if (_mode == 'Single') {
                         textBarcodeController.clear();
                         textModelController.clear();
                         textSerialController.clear();
-                        setState(() {
-                          _barcode = '';
-                          _model = '';
-                          _serial = '';
-                        });
+                        setState(() => {
+                              _barcode = '',
+                              _model = '',
+                              _serial = '',
+                            });
                         FocusScope.of(context).requestFocus(textBarcodeNode);
                       } else {
                         // Multiple
                         textSerialController.clear();
-                        setState(() {
-                          _serial = '';
-                        });
+                        setState(() => {_serial = ''});
                         FocusScope.of(context).requestFocus(textSerialNode);
                       }
                     } else {
@@ -388,20 +401,32 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
               ),
               IconButton(
+                icon: const Icon(Icons.remove_red_eye),
+                tooltip: 'View',
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ProductScanScreen(handleFile: HandleFile())),
+                  );
+                },
+              ),
+              IconButton(
                 icon: const Icon(Icons.restart_alt),
                 tooltip: 'Reset',
                 onPressed: () {
-                  setState(() {
-                    _type = 'Transfer';
-                    _mode = 'Single';
-                    _destination = '';
-                    _invoice = '';
-                    _truckID = '';
-                    _barcode = '';
-                    _model = '';
-                    _serial = '';
-                    _productScanList = [];
-                  });
+                  setState(() => {
+                        _type = 'Transfer',
+                        _mode = 'Single',
+                        _destination = '',
+                        _invoice = '',
+                        _truckID = '',
+                        _barcode = '',
+                        _model = '',
+                        _serial = '',
+                        _productScanList = []
+                      });
+                  // widget.handleFile.writeProductScans('');
                   textDestinationController.clear();
                   textInvoiceController.clear();
                   textTruckIDController.clear();
@@ -410,13 +435,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   textSerialController.clear();
                 },
               ),
-              // 8858730365089
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  for (var item in _productScanList)
-                    Text((' - Model: ${item._model}, Serial: ${item._serial}'))
-                ],
+              IconButton(
+                icon: const Icon(Icons.file_download),
+                tooltip: 'Export file',
+                onPressed: () {},
               ),
             ])),
       );
