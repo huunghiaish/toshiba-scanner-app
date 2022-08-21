@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: avoid_print, file_names
+
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -9,18 +10,6 @@ import 'dart:typed_data';
 import 'package:permission_handler/permission_handler.dart';
 
 class HandleFile {
-  // VARIABLE
-  static final _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  // OVERRIDE
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(),
-    );
-  }
-
   // FUNCTION
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
