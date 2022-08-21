@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Scanner product app',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -142,8 +142,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         ProductScanScreen(handleFile: HandleFile())),
               );
             }),
-        const Spacer(),
-        const Spacer(),
         IconButton(
             icon: const Icon(Icons.clear_all_outlined),
             onPressed: () async {
@@ -198,8 +196,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
               );
             }),
-        const Spacer(),
-        const Spacer(),
         IconButton(
             icon: const Icon(Icons.download_outlined),
             onPressed: () async {
