@@ -17,9 +17,10 @@ class Product {
   Product(this._barcode, this._model, this._serial);
 }
 
-void main() {
+void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await Future.delayed(const Duration(seconds: 1));
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
