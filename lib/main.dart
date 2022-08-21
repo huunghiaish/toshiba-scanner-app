@@ -5,6 +5,7 @@ import 'package:scanner_product_app/handleFile.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:scanner_product_app/screens/productScan.dart';
+import 'package:intl/intl.dart';
 
 // Defined Type
 class Product {
@@ -29,21 +30,11 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       useInheritedMediaQuery: true,
@@ -60,15 +51,6 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title, required this.handleFile})
       : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
   final HandleFile handleFile;
 
@@ -84,17 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _type = 'Transfer';
   String _mode = 'Single';
 
-  late final List<String> _productList = [
-    '8858730365089,GR-A13VT(H)',
-    '8858730365096,GR-A13VPT(SX)',
-    '8858730365102,GR-A13VPT(LB)',
-    '8858730365119,GR-A13VPT(BX)',
-    '8858730365256,GR-W21VPB(C)',
-    '8858730365263,GR-W21VPB(DS)',
-    '8858730365249,GR-W21VPB(S)',
-    '8858730365294,GR-W21VUB(BS)',
-    '8858730365300,GR-W21VUB(TS)'
-  ];
+  late List<String> _productList = [];
 
   late List<Product> _productScanList = [];
   late final List<String> _productSerialReturn = [];
@@ -123,16 +95,25 @@ class _MyHomePageState extends State<MyHomePage> {
   FocusNode textBarcodeNode = FocusNode();
   FocusNode textSerialNode = FocusNode();
 
+  // Function
+  String getContentExportProduct() {
+    String result = '';
+    for (var item in _productScanList) {
+      result =
+          '$result$_type,$_destination,$_invoice,$_truckID,${item._model},${item._serial}\n';
+    }
+    return result;
+  }
+
   @override
   void initState() {
     super.initState();
-    // widget.handleFile.readProducts().then((value) => {
-    //       // print('init: $value'),
-    //       if (mounted)
-    //         {
-    //           setState(() => {_productList = value}),
-    //         },
-    //     });
+    widget.handleFile.readProducts().then((value) => {
+          if (mounted)
+            {
+              setState(() => {_productList = value}),
+            },
+        });
   }
 
   @override
@@ -149,6 +130,192 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[_mainForm(), _scanForm()],
         ),
       ),
+      persistentFooterButtons: <Widget>[
+        IconButton(
+            icon: const Icon(Icons.remove_red_eye_outlined),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ProductScanScreen(handleFile: HandleFile())),
+              );
+            }),
+        const Spacer(),
+        const Spacer(),
+        IconButton(
+            icon: const Icon(Icons.clear_all_outlined),
+            onPressed: () async {
+              // set up the buttons
+              Widget cancelButton = TextButton(
+                child: const Text("Cancel"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              );
+              Widget continueButton = TextButton(
+                child: const Text("Yes"),
+                onPressed: () {
+                  setState(() => {
+                        _type = 'Transfer',
+                        _mode = 'Single',
+                        _destination = '',
+                        _invoice = '',
+                        _truckID = '',
+                        _barcode = '',
+                        _model = '',
+                        _serial = '',
+                        _productScanList = []
+                      });
+                  widget.handleFile.writeProductScans('');
+                  textDestinationController.clear();
+                  textInvoiceController.clear();
+                  textTruckIDController.clear();
+                  textBarcodeController.clear();
+                  textModelController.clear();
+                  textSerialController.clear();
+                  Navigator.pop(context);
+                },
+              );
+
+              // set up the AlertDialog
+              AlertDialog alert = AlertDialog(
+                title: const Text("Confirm clear data!"),
+                content: const Text(
+                    "Do you want to delete all scanned product data?"),
+                actions: [
+                  cancelButton,
+                  continueButton,
+                ],
+              );
+
+              // show the dialog
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return alert;
+                },
+              );
+            }),
+        const Spacer(),
+        const Spacer(),
+        IconButton(
+            icon: const Icon(Icons.download_outlined),
+            onPressed: () async {
+              // set up the buttons
+              Widget cancelButton = TextButton(
+                child: const Text("Cancel"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              );
+              Widget continueButton = TextButton(
+                child: const Text("Download"),
+                onPressed: () async {
+                  // get product scan
+                  setState(() {
+                    _productScanList = [];
+                  });
+                  await widget.handleFile.readProductScans().then((value) => {
+                        if (value.isNotEmpty)
+                          {
+                            for (var item in value)
+                              {
+                                setState(() {
+                                  _productScanList.add(Product(
+                                      item.split(',')[0],
+                                      item.split(',')[1],
+                                      item.split(',')[2]));
+                                })
+                              }
+                          }
+                      });
+                  // validate
+                  if (_productScanList.isEmpty) {
+                    var snackBar = SnackBar(
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error: PS404',
+                        message: 'Product scan list empty!',
+                        contentType: ContentType.failure,
+                      ),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  } else if (_destination == '' ||
+                      _invoice == '' ||
+                      _truckID == '') {
+                    var snackBar = SnackBar(
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error: FV404',
+                        message:
+                            'Required value:${_destination == '' ? ' Destination,' : ''}${_invoice == '' ? ' Invoice,' : ''}${_truckID == '' ? ' Truck ID.' : ''}',
+                        contentType: ContentType.failure,
+                      ),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
+                  //
+                  else {
+                    String formattedDate =
+                        DateFormat('dd-MM-yyyy').format(DateTime.now());
+                    String contentExport = getContentExportProduct();
+                    bool result = await widget.handleFile.saveFileStorage(
+                        contentExport,
+                        formattedDate,
+                        '$formattedDate-$_truckID.txt');
+                    if (result == true) {
+                      var snackBar = SnackBar(
+                        elevation: 0,
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.transparent,
+                        content: AwesomeSnackbarContent(
+                          title: 'Success',
+                          message: 'Export product scan success!',
+                          contentType: ContentType.success,
+                        ),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    } else {
+                      var snackBar = SnackBar(
+                        elevation: 0,
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.transparent,
+                        content: AwesomeSnackbarContent(
+                          title: 'Error: EP400',
+                          message:
+                              'Export ${_productScanList.length} product scan failed!',
+                          contentType: ContentType.failure,
+                        ),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
+                  }
+                  Navigator.pop(context);
+                },
+              );
+
+              // set up the AlertDialog
+              AlertDialog alert = AlertDialog(
+                title: const Text("Confirm download!"),
+                content: const Text("Do you want to download?"),
+                actions: [
+                  cancelButton,
+                  continueButton,
+                ],
+              );
+              // show the dialog
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return alert;
+                },
+              );
+            }),
+      ],
     );
   }
 
@@ -176,15 +343,28 @@ class _MyHomePageState extends State<MyHomePage> {
                       icon: const Icon(Icons.upload_file_outlined),
                       tooltip: 'Upload products',
                       onPressed: () {
-                        // widget.handleFile.pickFile().then((value) => {
-                        //       if (value == true) {print("Import thanh cong")},
-                        //       widget.handleFile.readProducts().then((value) => {
-                        //             print(value),
-                        //             {
-                        //               setState(() => {_productList = value}),
-                        //             },
-                        //           })
-                        //     });
+                        var snackBar = SnackBar(
+                          elevation: 0,
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.transparent,
+                          content: AwesomeSnackbarContent(
+                            title: 'Success',
+                            message: 'Import product list success!',
+                            contentType: ContentType.success,
+                          ),
+                        );
+                        widget.handleFile.importProductFile().then((value) => {
+                              if (value == true)
+                                {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar)
+                                },
+                              widget.handleFile.readProducts().then((value) => {
+                                    {
+                                      setState(() => {_productList = value}),
+                                    },
+                                  })
+                            });
                       },
                     ),
                   ),
@@ -300,9 +480,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         behavior: SnackBarBehavior.floating,
                         backgroundColor: Colors.transparent,
                         content: AwesomeSnackbarContent(
-                          title: 'Error 401!',
+                          title: 'Error: BC404',
                           message:
-                              'Barcode của sản phẩm này không tồn tại trong list product import',
+                              'The barcode of this product does not exist in the list of imported products',
                           contentType: ContentType.failure,
                         ),
                       );
@@ -358,7 +538,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         contentProductScan =
                             '$contentProductScan${item._barcode},${item._model},${item._serial}\n';
                       }
-                      // widget.handleFile.writeProductScans(contentProductScan);
+                      widget.handleFile.writeProductScans(contentProductScan);
                       if (_mode == 'Single') {
                         textBarcodeController.clear();
                         textModelController.clear();
@@ -389,9 +569,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       behavior: SnackBarBehavior.floating,
                       backgroundColor: Colors.transparent,
                       content: AwesomeSnackbarContent(
-                        title: 'Error 402!',
+                        title: 'Error: SE409',
                         message:
-                            'Mã seri của sản phẩm này đã được scan rồi, vui lòng kiễm tra lại!',
+                            'The serial code of this product has been scanned!',
                         contentType: ContentType.failure,
                       ),
                     );
@@ -399,46 +579,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     FocusScope.of(context).requestFocus(textSerialNode);
                   }
                 },
-              ),
-              IconButton(
-                icon: const Icon(Icons.remove_red_eye),
-                tooltip: 'View',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            ProductScanScreen(handleFile: HandleFile())),
-                  );
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.restart_alt),
-                tooltip: 'Reset',
-                onPressed: () {
-                  setState(() => {
-                        _type = 'Transfer',
-                        _mode = 'Single',
-                        _destination = '',
-                        _invoice = '',
-                        _truckID = '',
-                        _barcode = '',
-                        _model = '',
-                        _serial = '',
-                        _productScanList = []
-                      });
-                  // widget.handleFile.writeProductScans('');
-                  textDestinationController.clear();
-                  textInvoiceController.clear();
-                  textTruckIDController.clear();
-                  textBarcodeController.clear();
-                  textModelController.clear();
-                  textSerialController.clear();
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.file_download),
-                tooltip: 'Export file',
-                onPressed: () {},
               ),
             ])),
       );

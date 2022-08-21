@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:permission_handler/permission_handler.dart';
 
 class HandleFile {
   // VARIABLE
@@ -59,10 +60,6 @@ class HandleFile {
       } else {
         print("read file mobile");
         final file = await _localFileProduct;
-
-        // Read the file
-        // final contents = await file.readAsString();
-        // handle file
         await file
             .openRead()
             .transform(utf8.decoder)
@@ -92,30 +89,20 @@ class HandleFile {
       } else {
         print("read file mobile");
         final file = await _localFileProductScan;
-
-        // Read the file
-        // final contents = await file.readAsString();
-        // handle file
         await file
             .openRead()
             .transform(utf8.decoder)
             .transform(const LineSplitter())
             .forEach((line) => {productScanList.add(line)});
-        // list product return
         return productScanList;
       }
     } catch (e) {
-      // If encountering an error, return 0
       print(e);
       return [];
     }
-    return [];
   }
 
-  Future<bool> pickFile() async {
-    // opens storage to pick files and the picked file or files
-    // are assigned into result and if no file is chosen result is null.
-    // you can also toggle "allowMultiple" true or false depending on your need
+  Future<bool> importProductFile() async {
     final result = await FilePicker.platform
         .pickFiles(withReadStream: true, withData: true);
 
@@ -128,7 +115,72 @@ class HandleFile {
 
     String fileContent = utf8.decode(fileBytes!);
     await writeProducts(fileContent);
-    // List<String> lines = fileContent.split('\n');
     return true;
+  }
+
+  Future<String> getFilePathStorage() async {
+    Directory appDocumentsDirectory = await getApplicationDocumentsDirectory();
+    String appDocumentsPath = appDocumentsDirectory.path;
+    String filePath = '$appDocumentsPath/demoTextFile.txt';
+
+    return filePath;
+  }
+
+  Future<bool> saveFileStorage(content, folderName, fileName) async {
+    try {
+      Directory? directory;
+      if (Platform.isAndroid) {
+        if (await _requestPermission(Permission.storage) &&
+            await _requestPermission(Permission.accessMediaLocation) &&
+            await _requestPermission(Permission.manageExternalStorage)) {
+          directory = await getExternalStorageDirectory();
+          String newPath = "";
+          print(directory);
+          List<String> paths = directory!.path.split("/");
+          for (int x = 1; x < paths.length; x++) {
+            String folder = paths[x];
+            if (folder != "Android") {
+              newPath += "/$folder";
+            } else {
+              break;
+            }
+          }
+          newPath = "$newPath/Toshiba_SPA_Files/$folderName";
+          directory = Directory(newPath);
+        } else {
+          return false;
+        }
+      } else {
+        if (await _requestPermission(Permission.photos)) {
+          directory = await getTemporaryDirectory();
+        } else {
+          return false;
+        }
+      }
+      File file = File("${directory.path}/$fileName");
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+      if (await directory.exists()) {
+        await file.writeAsString(content);
+        return true;
+      }
+    } catch (err) {
+      print('error: $err');
+      return false;
+    }
+    return true;
+  }
+
+  Future<bool> _requestPermission(Permission permission) async {
+    if (await permission.isGranted) {
+      return true;
+    } else {
+      var result = await permission.request();
+      if (result == PermissionStatus.granted) {
+        return true;
+      }
+    }
+    return false;
   }
 }
