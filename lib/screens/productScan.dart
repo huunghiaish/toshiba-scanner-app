@@ -15,13 +15,44 @@ class ProductScanScreen extends StatefulWidget {
 
 class _MyProductScanScreenState extends State<ProductScanScreen> {
   late List<String> _productScanList = [];
-
+  late String barcode = '';
+  late int index = 0;
   @override
   void initState() {
     super.initState();
-    widget.handleFile.readProductScans().then((value) => setState(() {
-          _productScanList = value;
-        }));
+    widget.handleFile.readProductScans().then((value) => {
+          for (var item in value)
+            {
+              if (index == 0)
+                {
+                  setState(() {
+                    index = index + 1;
+                  }),
+                }
+              else
+                {
+                  if (barcode == item.split(',')[0])
+                    {
+                      setState(() {
+                        index = index + 1;
+                      }),
+                    }
+                  else
+                    {
+                      setState(() {
+                        index = 1;
+                      }),
+                    }
+                },
+              setState(() {
+                barcode = item.split(',')[0];
+              }),
+              setState(() {
+                _productScanList.add('$item,$index');
+              })
+            },
+          print(_productScanList),
+        });
   }
 
   void removeProduct() {
@@ -64,7 +95,8 @@ class _MyProductScanScreenState extends State<ProductScanScreen> {
                                       backgroundColor: Colors.blue,
                                       radius: 10,
                                       child: Text(
-                                        (index + 1).toString(),
+                                        (_productScanList[index].split(',')[3])
+                                            .toString(),
                                       ),
                                     ))),
                                 Expanded(

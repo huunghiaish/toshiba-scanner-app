@@ -46,6 +46,11 @@ class HandleFile {
       List<String> productList = [];
       if (kIsWeb) {
         print("read file web");
+        return [
+          '1111,AAAA',
+          '2222,BBBB',
+          '3333,CCCC',
+        ];
       } else {
         print("read file mobile");
         final file = await _localFileProduct;
@@ -71,9 +76,9 @@ class HandleFile {
       if (kIsWeb) {
         print("read file web");
         return [
-          '8858730365089,GR-A12VT(H),123',
-          '8858730365089,GR-A13VT(H),456',
-          '8858730365089,GR-A14VT(H),789',
+          '1111,AAAA,aaaa',
+          '2222,BBBB,bbbb',
+          '3333,CCCC,cccc',
         ];
       } else {
         print("read file mobile");
