@@ -125,8 +125,7 @@ class HandleFile {
       Directory? directory;
       if (Platform.isAndroid) {
         if (await _requestPermission(Permission.storage) &&
-            await _requestPermission(Permission.accessMediaLocation) &&
-            await _requestPermission(Permission.manageExternalStorage)) {
+            await _requestPermission(Permission.accessMediaLocation)) {
           directory = await getExternalStorageDirectory();
           String newPath = "";
           print(directory);
