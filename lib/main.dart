@@ -241,25 +241,22 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  }
-                  // else if (_destination == '' ||
-                  //     _invoice == '' ||
-                  //     _truckID == '') {
-                  //   var snackBar = SnackBar(
-                  //     elevation: 0,
-                  //     behavior: SnackBarBehavior.floating,
-                  //     backgroundColor: Colors.transparent,
-                  //     content: AwesomeSnackbarContent(
-                  //       title: 'Error: FV404',
-                  //       message:
-                  //           'Required value:${_destination == '' ? ' Destination,' : ''}${_invoice == '' ? ' Invoice,' : ''}${_truckID == '' ? ' Truck ID.' : ''}',
-                  //       contentType: ContentType.failure,
-                  //     ),
-                  //   );
-                  //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  // }
-                  //
-                  else {
+                  } else if (_destination == '' ||
+                      _invoice == '' ||
+                      _truckID == '') {
+                    var snackBar = SnackBar(
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error: FV404',
+                        message:
+                            'Required value:${_destination == '' ? ' Destination,' : ''}${_invoice == '' ? ' Invoice,' : ''}${_truckID == '' ? ' Truck ID.' : ''}',
+                        contentType: ContentType.failure,
+                      ),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  } else {
                     String formattedDate =
                         DateFormat('dd-MM-yyyy').format(DateTime.now());
                     String formattedDateHour =
@@ -391,57 +388,75 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
               ),
               TextFormField(
-                  controller: textDestinationController,
-                  decoration: InputDecoration(
-                      labelText: "Destination",
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          textDestinationController.clear();
-                          setState(() => {_destination = ''});
-                        },
-                        icon: const Icon(Icons.clear),
-                      )),
-                  focusNode: textDestinationNode,
-                  onFieldSubmitted: (String value) {
-                    setState(() {
-                      _destination = value.trim();
-                    });
-                    FocusScope.of(context).requestFocus(textInvoiceNode);
-                  }),
+                controller: textDestinationController,
+                decoration: InputDecoration(
+                    labelText: "Destination",
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        textDestinationController.clear();
+                        setState(() => {_destination = ''});
+                      },
+                      icon: const Icon(Icons.clear),
+                    )),
+                focusNode: textDestinationNode,
+                onFieldSubmitted: (String value) {
+                  setState(() {
+                    _destination = value.trim();
+                  });
+                  FocusScope.of(context).requestFocus(textInvoiceNode);
+                },
+                onChanged: (String value) {
+                  setState(() {
+                    _destination = value;
+                  });
+                },
+              ),
               TextFormField(
-                  controller: textInvoiceController,
-                  decoration: InputDecoration(
-                      labelText: "Invoice",
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          textInvoiceController.clear();
-                          setState(() => {_invoice = ''});
-                        },
-                        icon: const Icon(Icons.clear),
-                      )),
-                  focusNode: textInvoiceNode,
-                  onFieldSubmitted: (String value) {
-                    setState(() => {_invoice = value.trim()});
-                    FocusScope.of(context).requestFocus(textTruckIDNode);
-                  }),
+                controller: textInvoiceController,
+                decoration: InputDecoration(
+                    labelText: "Invoice",
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        textInvoiceController.clear();
+                        setState(() => {_invoice = ''});
+                      },
+                      icon: const Icon(Icons.clear),
+                    )),
+                focusNode: textInvoiceNode,
+                onFieldSubmitted: (String value) {
+                  setState(() => {_invoice = value.trim()});
+                  FocusScope.of(context).requestFocus(textTruckIDNode);
+                },
+                onChanged: (String value) {
+                  setState(() {
+                    _invoice = value;
+                  });
+                },
+              ),
               TextFormField(
-                  controller: textTruckIDController,
-                  decoration: InputDecoration(
-                      labelText: "Truck ID",
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          textTruckIDController.clear();
-                          setState(() => {_truckID = ''});
-                        },
-                        icon: const Icon(Icons.clear),
-                      )),
-                  focusNode: textTruckIDNode,
-                  onFieldSubmitted: (String value) {
-                    setState(() {
-                      _truckID = value.trim();
-                    });
-                    // FocusScope.of(context).requestFocus(dropdownModeNode);
-                  }),
+                controller: textTruckIDController,
+                decoration: InputDecoration(
+                    labelText: "Truck ID",
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        textTruckIDController.clear();
+                        setState(() => {_truckID = ''});
+                      },
+                      icon: const Icon(Icons.clear),
+                    )),
+                focusNode: textTruckIDNode,
+                onFieldSubmitted: (String value) {
+                  setState(() {
+                    _truckID = value.trim();
+                  });
+                  // FocusScope.of(context).requestFocus(dropdownModeNode);
+                },
+                onChanged: (String value) {
+                  setState(() {
+                    _truckID = value;
+                  });
+                },
+              ),
               DropdownButtonFormField(
                 decoration: const InputDecoration(labelText: "Mode"),
                 value: _mode,

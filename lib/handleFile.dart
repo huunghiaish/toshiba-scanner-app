@@ -126,6 +126,8 @@ class HandleFile {
       if (Platform.isAndroid) {
         if (await _requestPermission(Permission.storage) &&
             await _requestPermission(Permission.accessMediaLocation)) {
+          // android 11
+          // if (await _requestPermission(Permission.manageExternalStorage)) {}
           directory = await getExternalStorageDirectory();
           String newPath = "";
           print(directory);
@@ -170,6 +172,8 @@ class HandleFile {
       return true;
     } else {
       var result = await permission.request();
+      print(permission);
+      print(result);
       if (result == PermissionStatus.granted) {
         return true;
       }
