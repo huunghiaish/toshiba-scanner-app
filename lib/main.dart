@@ -241,39 +241,44 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  } else if (_destination == '' ||
-                      _invoice == '' ||
-                      _truckID == '') {
-                    var snackBar = SnackBar(
-                      elevation: 0,
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      content: AwesomeSnackbarContent(
-                        title: 'Error: FV404',
-                        message:
-                            'Required value:${_destination == '' ? ' Destination,' : ''}${_invoice == '' ? ' Invoice,' : ''}${_truckID == '' ? ' Truck ID.' : ''}',
-                        contentType: ContentType.failure,
-                      ),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
+                  // else if (_destination == '' ||
+                  //     _invoice == '' ||
+                  //     _truckID == '') {
+                  //   var snackBar = SnackBar(
+                  //     elevation: 0,
+                  //     behavior: SnackBarBehavior.floating,
+                  //     backgroundColor: Colors.transparent,
+                  //     content: AwesomeSnackbarContent(
+                  //       title: 'Error: FV404',
+                  //       message:
+                  //           'Required value:${_destination == '' ? ' Destination,' : ''}${_invoice == '' ? ' Invoice,' : ''}${_truckID == '' ? ' Truck ID.' : ''}',
+                  //       contentType: ContentType.failure,
+                  //     ),
+                  //   );
+                  //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  // }
                   //
                   else {
                     String formattedDate =
                         DateFormat('dd-MM-yyyy').format(DateTime.now());
+                    String formattedDateHour =
+                        DateFormat('dd-MM-yyyy--HH-mm-ss')
+                            .format(DateTime.now());
                     String contentExport = getContentExportProduct();
-                    bool result = await widget.handleFile.saveFileStorage(
+                    String result = await widget.handleFile.saveFileStorage(
                         contentExport,
                         formattedDate,
-                        '$formattedDate-$_truckID.txt');
-                    if (result == true) {
+                        '$_truckID--$formattedDateHour.txt');
+                    if (result == "true") {
                       var snackBar = SnackBar(
                         elevation: 0,
                         behavior: SnackBarBehavior.floating,
                         backgroundColor: Colors.transparent,
                         content: AwesomeSnackbarContent(
                           title: 'Success',
-                          message: 'Export product scan success!',
+                          message:
+                              'Export ${_productScanList.length} product scan success!',
                           contentType: ContentType.success,
                         ),
                       );
@@ -285,8 +290,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         backgroundColor: Colors.transparent,
                         content: AwesomeSnackbarContent(
                           title: 'Error: EP400',
-                          message:
-                              'Export ${_productScanList.length} product scan failed!',
+                          message: result,
                           contentType: ContentType.failure,
                         ),
                       );
@@ -519,7 +523,25 @@ class _MyHomePageState extends State<MyHomePage> {
                       icon: const Icon(Icons.clear),
                     )),
                 focusNode: textSerialNode,
-                onFieldSubmitted: (String value) {
+                onFieldSubmitted: (String value) async {
+                  // load current list from file
+                  await widget.handleFile.readProductScans().then((value) => {
+                        if (value.isNotEmpty)
+                          {
+                            setState(() {
+                              _productScanList = [];
+                            }),
+                            for (var item in value)
+                              {
+                                setState(() {
+                                  _productScanList.add(Product(
+                                      item.split(',')[0],
+                                      item.split(',')[1],
+                                      item.split(',')[2]));
+                                })
+                              }
+                          }
+                      });
                   var contain = _productScanList
                       .where((element) => element._serial == value);
                   if (contain.isEmpty) {

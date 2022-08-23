@@ -20,6 +20,10 @@ class _MyProductScanScreenState extends State<ProductScanScreen> {
   @override
   void initState() {
     super.initState();
+    setState(() {
+      _productScanList = [];
+    });
+
     widget.handleFile.readProductScans().then((value) => {
           for (var item in value)
             {
@@ -51,11 +55,10 @@ class _MyProductScanScreenState extends State<ProductScanScreen> {
                 _productScanList.add('$item,$index');
               })
             },
-          print(_productScanList),
         });
   }
 
-  void removeProduct() {
+  void reloadState() {
     setState(() => {_productScanList = []});
   }
 
@@ -81,7 +84,7 @@ class _MyProductScanScreenState extends State<ProductScanScreen> {
             ),
           ),
           StatefulBuilder(
-              builder: (innerContext, removeProduct) => SliverList(
+              builder: (innerContext, reloadState) => SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
                         return InkWell(
@@ -113,20 +116,19 @@ class _MyProductScanScreenState extends State<ProductScanScreen> {
                                       child: IconButton(
                                         icon: const Icon(Icons.delete),
                                         tooltip: 'Delete',
-                                        onPressed: () {
-                                          removeProduct(() => {
-                                                _productScanList.removeWhere(
-                                                    (item) =>
-                                                        item ==
-                                                        _productScanList[index])
-                                              });
+                                        onPressed: () async {
+                                          _productScanList.removeWhere((item) =>
+                                              item == _productScanList[index]);
+
                                           String contentProductScan = '';
                                           for (var item in _productScanList) {
                                             contentProductScan =
-                                                '$contentProductScan$item\n';
+                                                '$contentProductScan${item.split(',')[0]},${item.split(',')[1]},${item.split(',')[2]}\n';
                                           }
-                                          widget.handleFile.writeProductScans(
-                                              contentProductScan);
+                                          await widget.handleFile
+                                              .writeProductScans(
+                                                  contentProductScan);
+                                          reloadState(() => {_productScanList});
                                         },
                                       ),
                                     )),

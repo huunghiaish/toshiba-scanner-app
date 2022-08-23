@@ -120,7 +120,7 @@ class HandleFile {
     return filePath;
   }
 
-  Future<bool> saveFileStorage(content, folderName, fileName) async {
+  Future<String> saveFileStorage(content, folderName, fileName) async {
     try {
       Directory? directory;
       if (Platform.isAndroid) {
@@ -142,13 +142,13 @@ class HandleFile {
           newPath = "$newPath/Toshiba_SPA_Files/$folderName";
           directory = Directory(newPath);
         } else {
-          return false;
+          return "Not accept permission android";
         }
       } else {
         if (await _requestPermission(Permission.photos)) {
           directory = await getTemporaryDirectory();
         } else {
-          return false;
+          return "Not accept permission ios";
         }
       }
       File file = File("${directory.path}/$fileName");
@@ -157,13 +157,13 @@ class HandleFile {
       }
       if (await directory.exists()) {
         await file.writeAsString(content);
-        return true;
+        return "true";
       }
     } catch (err) {
       print('error: $err');
-      return false;
+      return err.toString();
     }
-    return true;
+    return "true";
   }
 
   Future<bool> _requestPermission(Permission permission) async {
