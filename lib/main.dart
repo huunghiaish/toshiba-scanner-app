@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:scanner_product_app/handleFile.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:scanner_product_app/screens/productReturn.dart';
 import 'package:scanner_product_app/screens/productScan.dart';
 import 'package:intl/intl.dart';
 
@@ -72,7 +73,6 @@ class _MyHomePageState extends State<MyHomePage> {
   late List<String> _productList = [];
 
   late List<Product> _productScanList = [];
-  late final List<String> _productSerialReturn = [];
 
   late String? _destination = '';
   late String? _invoice = '';
@@ -90,6 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var textBarcodeController = TextEditingController();
   var textModelController = TextEditingController();
   var textSerialController = TextEditingController();
+  var textSerialReturnController = TextEditingController();
 
   FocusNode textDestinationNode = FocusNode();
   FocusNode textInvoiceNode = FocusNode();
@@ -97,6 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
   FocusNode dropdownModeNode = FocusNode();
   FocusNode textBarcodeNode = FocusNode();
   FocusNode textSerialNode = FocusNode();
+  FocusNode textSerialReturnNode = FocusNode();
 
   // Function
   String getContentExportProduct() {
@@ -130,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[_mainForm(), _scanForm()],
+          children: <Widget>[_mainForm()],
         ),
       ),
       persistentFooterButtons: <Widget>[
@@ -141,6 +143,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 MaterialPageRoute(
                     builder: (context) =>
                         ProductScanScreen(handleFile: HandleFile())),
+              );
+            }),
+        IconButton(
+            icon: const Icon(Icons.assignment_return_outlined),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ProductReturnScreen(handleFile: HandleFile())),
               );
             }),
         IconButton(
@@ -539,6 +550,27 @@ class _MyHomePageState extends State<MyHomePage> {
                     )),
                 focusNode: textSerialNode,
                 onFieldSubmitted: (String value) async {
+                  // check serial return
+                  var productReturnList = [];
+                  await widget.handleFile.readProductReturns().then((value) => {
+                        if (value.isNotEmpty) {productReturnList = value}
+                      });
+                  var existedSerialReturn =
+                      productReturnList.where((element) => element == value);
+                  if (existedSerialReturn.isNotEmpty) {
+                    var snackBar = SnackBar(
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error: SR409',
+                        message: 'This Serial is a return products!',
+                        contentType: ContentType.failure,
+                      ),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    return;
+                  }
                   // load current list from file
                   await widget.handleFile.readProductScans().then((value) => {
                         if (value.isNotEmpty)
@@ -618,8 +650,32 @@ class _MyHomePageState extends State<MyHomePage> {
                   }
                 },
               ),
+              TextFormField(
+                controller: textSerialReturnController,
+                decoration: InputDecoration(
+                    labelText: "Return Product Serial",
+                    suffixIcon: IconButton(
+                      onPressed: () async {
+                        textSerialReturnController.clear();
+                      },
+                      icon: const Icon(Icons.clear),
+                    )),
+                focusNode: textSerialReturnNode,
+                onFieldSubmitted: (String value) async {
+                  var productReturnList = [];
+                  await widget.handleFile.readProductReturns().then((value) => {
+                        if (value.isNotEmpty) {productReturnList = value}
+                      });
+                  productReturnList.add(value);
+                  String contentProductReturn = '';
+                  for (var item in productReturnList) {
+                    contentProductReturn = '$contentProductReturn$item\n';
+                  }
+                  await widget.handleFile
+                      .writeProductReturns(contentProductReturn);
+                  textSerialReturnController.clear();
+                },
+              ),
             ])),
       );
-
-  _scanForm() => Container();
 }

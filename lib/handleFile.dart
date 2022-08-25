@@ -41,6 +41,18 @@ class HandleFile {
     return file.writeAsString(productList);
   }
 
+  Future<File> get _localFileProductReturn async {
+    final path = await _localPath;
+    return File('$path/productReturns.txt');
+  }
+
+  Future<File> writeProductReturns(String productList) async {
+    final file = await _localFileProductReturn;
+
+    // Write the file
+    return file.writeAsString(productList);
+  }
+
   Future<List<String>> readProducts() async {
     try {
       List<String> productList = [];
@@ -67,7 +79,6 @@ class HandleFile {
       print(e);
       return [];
     }
-    return [];
   }
 
   Future<List<String>> readProductScans() async {
@@ -89,6 +100,32 @@ class HandleFile {
             .transform(const LineSplitter())
             .forEach((line) => {productScanList.add(line)});
         return productScanList;
+      }
+    } catch (e) {
+      print(e);
+      return [];
+    }
+  }
+
+  Future<List<String>> readProductReturns() async {
+    try {
+      List<String> productReturnList = [];
+      if (kIsWeb) {
+        print("read file web");
+        return [
+          'aaaa',
+          'bbbb',
+          'cccc',
+        ];
+      } else {
+        print("read file mobile");
+        final file = await _localFileProductReturn;
+        await file
+            .openRead()
+            .transform(utf8.decoder)
+            .transform(const LineSplitter())
+            .forEach((line) => {productReturnList.add(line)});
+        return productReturnList;
       }
     } catch (e) {
       print(e);
