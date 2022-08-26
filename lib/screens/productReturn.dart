@@ -75,8 +75,11 @@ class _MyProductReturnScreenState extends State<ProductReturnScreen> {
                                     child: Center(
                                         child: CircleAvatar(
                                       backgroundColor: Colors.blue,
-                                      radius: 10,
-                                      child: Text((index + 1).toString()),
+                                      radius: 20,
+                                      child: Text(
+                                        (index + 1).toString(),
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
                                     ))),
                                 Expanded(
                                     child: Center(

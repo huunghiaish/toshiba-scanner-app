@@ -96,10 +96,11 @@ class _MyProductScanScreenState extends State<ProductScanScreen> {
                                     child: Center(
                                         child: CircleAvatar(
                                       backgroundColor: Colors.blue,
-                                      radius: 10,
+                                      minRadius: 20,
                                       child: Text(
                                         (_productScanList[index].split(',')[3])
                                             .toString(),
+                                        style: const TextStyle(fontSize: 14),
                                       ),
                                     ))),
                                 Expanded(
