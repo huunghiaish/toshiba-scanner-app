@@ -159,13 +159,13 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () async {
               // set up the buttons
               Widget cancelButton = TextButton(
-                child: const Text("Cancel"),
+                child: const Text("Trở lại"),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               );
               Widget continueButton = TextButton(
-                child: const Text("Yes"),
+                child: const Text("Đồng ý"),
                 onPressed: () {
                   setState(() => {
                         _type = 'Transfer',
@@ -191,9 +191,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
               // set up the AlertDialog
               AlertDialog alert = AlertDialog(
-                title: const Text("Confirm clear data!"),
+                title: const Text("Xác nhận xoá dữ liệu!"),
                 content: const Text(
-                    "Do you want to delete all scanned product data?"),
+                    "Bạn có muốn xóa tất cả dữ liệu sản phẩm đã quét không?"),
                 actions: [
                   cancelButton,
                   continueButton,
@@ -213,13 +213,13 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () async {
               // set up the buttons
               Widget cancelButton = TextButton(
-                child: const Text("Cancel"),
+                child: const Text("Trở lại"),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               );
               Widget continueButton = TextButton(
-                child: const Text("Download"),
+                child: const Text("Tải xuống"),
                 onPressed: () async {
                   // get product scan
                   setState(() {
@@ -246,8 +246,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       behavior: SnackBarBehavior.floating,
                       backgroundColor: Colors.transparent,
                       content: AwesomeSnackbarContent(
-                        title: 'Error: PS404',
-                        message: 'Product scan list empty!',
+                        title: 'Lỗi: PS404',
+                        message: 'Danh sách Sản phẩm được quét trống!',
                         contentType: ContentType.failure,
                       ),
                     );
@@ -260,9 +260,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       behavior: SnackBarBehavior.floating,
                       backgroundColor: Colors.transparent,
                       content: AwesomeSnackbarContent(
-                        title: 'Error: FV404',
+                        title: 'Lỗi: FV404',
                         message:
-                            'Required value:${_destination == '' ? ' Destination,' : ''}${_invoice == '' ? ' Invoice,' : ''}${_truckID == '' ? ' Truck ID.' : ''}',
+                            'Chưa nhập:${_destination == '' ? ' Destination,' : ''}${_invoice == '' ? ' Invoice,' : ''}${_truckID == '' ? ' Truck ID.' : ''}',
                         contentType: ContentType.failure,
                       ),
                     );
@@ -286,7 +286,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         content: AwesomeSnackbarContent(
                           title: 'Success',
                           message:
-                              'Export ${_productScanList.length} product scan success!',
+                              'Xuất ${_productScanList.length} sản phẩm đã quét thành công!',
                           contentType: ContentType.success,
                         ),
                       );
@@ -297,7 +297,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         behavior: SnackBarBehavior.floating,
                         backgroundColor: Colors.transparent,
                         content: AwesomeSnackbarContent(
-                          title: 'Error: EP400',
+                          title: 'Lỗi: EP400',
                           message: result,
                           contentType: ContentType.failure,
                         ),
@@ -311,8 +311,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
               // set up the AlertDialog
               AlertDialog alert = AlertDialog(
-                title: const Text("Confirm download!"),
-                content: const Text("Do you want to download?"),
+                title: const Text("Xác nhận tải xuống!"),
+                content: const Text("Bạn có muốn tải xuống?"),
                 actions: [
                   cancelButton,
                   continueButton,
@@ -359,8 +359,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           behavior: SnackBarBehavior.floating,
                           backgroundColor: Colors.transparent,
                           content: AwesomeSnackbarContent(
-                            title: 'Success',
-                            message: 'Import product list success!',
+                            title: 'Thành công',
+                            message: 'Nhập danh sách sản phẩm thành công!',
                             contentType: ContentType.success,
                           ),
                         );
@@ -509,9 +509,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         behavior: SnackBarBehavior.floating,
                         backgroundColor: Colors.transparent,
                         content: AwesomeSnackbarContent(
-                          title: 'Error: BC404',
+                          title: 'Lỗi: BC404',
                           message:
-                              'The barcode of this product does not exist in the list of imported products',
+                              'Mã vạch của sản phẩm này không tồn tại trong danh mục sản phẩm đã nhập',
                           contentType: ContentType.failure,
                         ),
                       );
@@ -563,8 +563,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       behavior: SnackBarBehavior.floating,
                       backgroundColor: Colors.transparent,
                       content: AwesomeSnackbarContent(
-                        title: 'Error: SR409',
-                        message: 'This Serial is a return products!',
+                        title: 'Lỗi: SR409',
+                        message: 'Mã sê-ri này là một sản phẩm trả lại!',
                         contentType: ContentType.failure,
                       ),
                     );
@@ -639,9 +639,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       behavior: SnackBarBehavior.floating,
                       backgroundColor: Colors.transparent,
                       content: AwesomeSnackbarContent(
-                        title: 'Error: SE409',
-                        message:
-                            'The serial code of this product has been scanned!',
+                        title: 'Lỗi: SE409',
+                        message: 'Mã sê-ri của sản phẩm này đã được quét!',
                         contentType: ContentType.failure,
                       ),
                     );

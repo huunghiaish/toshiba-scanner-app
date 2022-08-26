@@ -19,7 +19,6 @@ class _MyProductReturnScreenState extends State<ProductReturnScreen> {
   late String barcode = '';
   late int index = 0;
 
-  late final String? _serial = '';
   var textSerialController = TextEditingController();
   FocusNode textSerialNode = FocusNode();
   @override
@@ -47,7 +46,7 @@ class _MyProductReturnScreenState extends State<ProductReturnScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Product return'),
+        title: Text('Product return (${_productReturnList.length})'),
       ),
       body: CustomScrollView(
         slivers: <Widget>[

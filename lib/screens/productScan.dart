@@ -66,7 +66,7 @@ class _MyProductScanScreenState extends State<ProductScanScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Product scan'),
+        title: Text('Product scan (${_productScanList.length})'),
       ),
       body: CustomScrollView(
         slivers: <Widget>[
