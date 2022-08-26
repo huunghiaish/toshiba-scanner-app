@@ -92,14 +92,15 @@ class _MyProductScanScreenState extends State<ProductScanScreen> {
                             title: Row(
                               children: <Widget>[
                                 SizedBox(
-                                    width: 40,
+                                    width: 30,
                                     child: Center(
                                         child: CircleAvatar(
                                       backgroundColor: Colors.blue,
-                                      minRadius: 20,
+                                      minRadius: 10,
                                       child: Text(
-                                        (9999).toString(),
-                                        style: const TextStyle(fontSize: 14),
+                                        (_productScanList[index].split(',')[3])
+                                            .toString(),
+                                        style: const TextStyle(fontSize: 10),
                                       ),
                                     ))),
                                 Expanded(

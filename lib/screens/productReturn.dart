@@ -71,14 +71,14 @@ class _MyProductReturnScreenState extends State<ProductReturnScreen> {
                             title: Row(
                               children: <Widget>[
                                 SizedBox(
-                                    width: 40,
+                                    width: 30,
                                     child: Center(
                                         child: CircleAvatar(
                                       backgroundColor: Colors.blue,
-                                      radius: 20,
+                                      radius: 10,
                                       child: Text(
                                         (index + 1).toString(),
-                                        style: const TextStyle(fontSize: 14),
+                                        style: const TextStyle(fontSize: 10),
                                       ),
                                     ))),
                                 Expanded(
