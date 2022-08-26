@@ -71,7 +71,7 @@ class _MyProductReturnScreenState extends State<ProductReturnScreen> {
                             title: Row(
                               children: <Widget>[
                                 SizedBox(
-                                    width: 30,
+                                    width: 40,
                                     child: Center(
                                         child: CircleAvatar(
                                       backgroundColor: Colors.blue,
