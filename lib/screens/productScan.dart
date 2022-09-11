@@ -98,7 +98,7 @@ class _MyProductScanScreenState extends State<ProductScanScreen> {
                                       backgroundColor: Colors.blue,
                                       minRadius: 10,
                                       child: Text(
-                                        (_productScanList[index].split(',')[3])
+                                        (_productScanList[index].split(',')[5])
                                             .toString(),
                                         style: const TextStyle(fontSize: 10),
                                       ),
@@ -124,7 +124,7 @@ class _MyProductScanScreenState extends State<ProductScanScreen> {
                                           String contentProductScan = '';
                                           for (var item in _productScanList) {
                                             contentProductScan =
-                                                '$contentProductScan${item.split(',')[0]},${item.split(',')[1]},${item.split(',')[2]}\n';
+                                                '$contentProductScan${item.split(',')[0]},${item.split(',')[1]},${item.split(',')[2]},${item.split(',')[3]},${item.split(',')[4]}\n';
                                           }
                                           await widget.handleFile
                                               .writeProductScans(

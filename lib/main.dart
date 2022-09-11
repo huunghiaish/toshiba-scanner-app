@@ -15,7 +15,10 @@ class Product {
   late final String? _barcode;
   late final String? _model;
   late final String? _serial;
-  Product(this._barcode, this._model, this._serial);
+  late final String? _destination;
+  late final String? _invoice;
+  Product(this._barcode, this._model, this._serial, this._destination,
+      this._invoice);
 }
 
 void main() async {
@@ -105,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
     String result = '';
     for (var item in _productScanList) {
       result =
-          '$result$_type,$_destination,$_invoice,$_truckID,${item._model},${item._serial}\n';
+          '$result$_type,${item._destination},${item._invoice},$_truckID,${item._model},${item._serial}\n';
     }
     return result;
   }
@@ -234,7 +237,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                   _productScanList.add(Product(
                                       item.split(',')[0],
                                       item.split(',')[1],
-                                      item.split(',')[2]));
+                                      item.split(',')[2],
+                                      item.split(',')[3],
+                                      item.split(',')[4]));
                                 })
                               }
                           }
@@ -584,7 +589,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                   _productScanList.add(Product(
                                       item.split(',')[0],
                                       item.split(',')[1],
-                                      item.split(',')[2]));
+                                      item.split(',')[2],
+                                      item.split(',')[3],
+                                      item.split(',')[4]));
                                 })
                               }
                           }
@@ -598,15 +605,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     if (_barcode != '' && _model != '' && _serial != '') {
                       // save list product scan
                       setState(() {
-                        _productScanList
-                            .add(Product(_barcode, _model, _serial));
+                        _productScanList.add(Product(
+                            _barcode, _model, _serial, _destination, _invoice));
                       });
                       _productScanList
                           .sort((a, b) => a._barcode!.compareTo(b._barcode!));
                       String contentProductScan = '';
                       for (var item in _productScanList) {
                         contentProductScan =
-                            '$contentProductScan${item._barcode},${item._model},${item._serial}\n';
+                            '$contentProductScan${item._barcode},${item._model},${item._serial},${item._destination},${item._invoice}\n';
                       }
                       widget.handleFile.writeProductScans(contentProductScan);
                       if (_mode == 'Single') {
