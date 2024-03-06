@@ -608,8 +608,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         _productScanList.add(Product(
                             _barcode, _model, _serial, _destination, _invoice));
                       });
-                      _productScanList
-                          .sort((a, b) => a._barcode!.compareTo(b._barcode!));
+                      // _productScanList
+                      //     .sort((a, b) => a._barcode!.compareTo(b._barcode!));
                       String contentProductScan = '';
                       for (var item in _productScanList) {
                         contentProductScan =
